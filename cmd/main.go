@@ -1,11 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"context"
+
+	"github.com/minskylab/figport"
+	"github.com/sirupsen/logrus"
 	// "github.com/minskylab/figport"
 )
 
 func main() {
-	fmt.Println("abc")
-	// figport.Register()
+	figport, err := figport.NewDefault(context.Background(), true)
+	if err != nil {
+		logrus.Panic(err.Error())
+	}
+
+	if err := figport.Start(); err != nil {
+		logrus.Panic(err.Error())
+	}
 }

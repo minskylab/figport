@@ -6,6 +6,9 @@ const HostNameKey = "HOSTNAME"
 // FigportPrefix the prefix to enable exportation in your figma file
 const FigportPrefix = "PREFIXTOEXPORT"
 
+// Port is port
+const Port = "PORT"
+
 //
 
 // FigmaOauthURL TODO: writedescription
@@ -39,3 +42,8 @@ const S3Region = "S3_REGION"
 
 // S3Bucket TODO: writedescription
 const S3Bucket = "S3_BUCKET"
+
+//
+
+// RedisAddress ...
+const RedisAddress = "REDIS_ADDRESS"

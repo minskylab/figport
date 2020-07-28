@@ -7,11 +7,7 @@ import (
 	"github.com/minskylab/figport/figma"
 )
 
-type imageFormat struct {
-	Name string
-}
-
-type SVGMod struct{ imageFormat }
+type SVGMod struct{}
 
 func (mod *SVGMod) Name() string {
 	return "svg"

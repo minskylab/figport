@@ -9,14 +9,15 @@ import (
 	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
-func (fig *Figport) getMinioClientFromConfig() *minio.Client {
-	s3Endpoint := fig.config.GetString(config.S3Endpoint)
-	s3AccessKeyID := fig.config.GetString(config.S3AccessKeyID)
-	s3SecretKey := fig.config.GetString(config.S3SecretKey)
-	s3UseSSL := fig.config.GetBool(config.S3UseSSL)
-	s3Region := fig.config.GetString(config.S3Region)
+func getMinioClientFromConfig(conf *viper.Viper) *minio.Client {
+	s3Endpoint := conf.GetString(config.S3Endpoint)
+	s3AccessKeyID := conf.GetString(config.S3AccessKeyID)
+	s3SecretKey := conf.GetString(config.S3SecretKey)
+	s3UseSSL := conf.GetBool(config.S3UseSSL)
+	s3Region := conf.GetString(config.S3Region)
 
 	client, err := minio.New(s3Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3AccessKeyID, s3SecretKey, ""),
@@ -27,8 +28,6 @@ func (fig *Figport) getMinioClientFromConfig() *minio.Client {
 	if err != nil {
 		logrus.Panic(errors.WithStack(err))
 	}
-
-	fig.s3Client = client
 
 	return client
 }

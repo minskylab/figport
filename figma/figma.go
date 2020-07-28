@@ -13,3 +13,12 @@ type Figma struct {
 	httpClient *http.Client
 	jsonParser *fastjson.Parser
 }
+
+// New returns a new instace of Figma
+func New(config *viper.Viper, httpClient *http.Client, jsonParser *fastjson.Parser) Figma {
+	return Figma{
+		config:     config,
+		httpClient: httpClient,
+		jsonParser: jsonParser,
+	}
+}
