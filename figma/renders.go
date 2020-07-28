@@ -10,10 +10,17 @@ type Render struct {
 // RenderFormat determine the export type of your Figma Node
 type RenderFormat string
 
-const jpg RenderFormat = "jpg"
-const png RenderFormat = "png"
-const svg RenderFormat = "svg"
-const pdf RenderFormat = "pdf"
+// JPGRender is a type of Figma render
+const JPGRender RenderFormat = "jpg"
+
+// PNGRender is a type of Figma render
+const PNGRender RenderFormat = "png"
+
+// SVGRender is a type of Figma render
+const SVGRender RenderFormat = "svg"
+
+// PDFRender is a type of Figma render
+const PDFRender RenderFormat = "pdf"
 
 // RenderOptions wraps the options to specify your export (render) task
 type RenderOptions struct {

@@ -10,5 +10,5 @@ import (
 type Mod interface {
 	Name() string
 	Params() map[string]string
-	Process(opts *exporting.ExportNodeOptions, params map[string]string) ([]figma.RenderOptions, error)
+	Process(opts exporting.ExportNodeOptions, params map[string]string) ([]figma.RenderOptions, error)
 }

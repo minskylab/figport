@@ -5,7 +5,6 @@ type ExportNodeOptions struct {
 	Raw      string
 	Path     string
 	Filename string
-	Format   string
-	Mods     string
-	Scale    string
+	Mods     []string
+	Scales   []float64
 }
