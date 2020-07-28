@@ -1,49 +1,49 @@
 package config
 
 // HostNameKey TODO: writedescription
-const HostNameKey = "HOSTNAME"
+const HostNameKey = "hostname"
 
 // FigportPrefix the prefix to enable exportation in your figma file
-const FigportPrefix = "PREFIXTOEXPORT"
+const FigportPrefix = "figport.prefix"
 
 // Port is port
-const Port = "PORT"
+const Port = "port"
 
 //
 
 // FigmaOauthURL TODO: writedescription
-const FigmaOauthURL = "FIGMAPP_OAUTH_BASE"
+const FigmaOauthURL = "figma.oauthbase"
 
 // FigmaAppClientID TODO: writedescription
-const FigmaAppClientID = "FIGMAPP_CLIENTID"
+const FigmaAppClientID = "figma.clientid"
 
 // FigmaClientSecret TODO: writedescription
-const FigmaClientSecret = "FIGMAPP_CLIENTSECRET"
+const FigmaClientSecret = "figma.clientsecret"
 
 // FigmaRedirectURI TODO: writedescription
-const FigmaRedirectURI = "FIGMAPP_REDIRECTURI"
+const FigmaRedirectURI = "figma.redirecturi"
 
 //
 
 // S3Endpoint TODO: writedescription
-const S3Endpoint = "S3_HOSTENDPOINT"
+const S3Endpoint = "s3.endpoint"
 
 // S3AccessKeyID TODO: writedescription
-const S3AccessKeyID = "S3_ACCESSKEY"
+const S3AccessKeyID = "s3.accesskey"
 
 // S3SecretKey TODO: writedescription
-const S3SecretKey = "S3_SECRETKEY"
+const S3SecretKey = "s3.secretkey"
 
 // S3UseSSL TODO: writedescription
-const S3UseSSL = "S3_USESSL"
+const S3UseSSL = "s3.usessl"
 
 // S3Region TODO: writedescription
-const S3Region = "S3_REGION"
+const S3Region = "s3.region"
 
 // S3Bucket TODO: writedescription
-const S3Bucket = "S3_BUCKET"
+const S3Bucket = "s3.bucket"
 
 //
 
 // RedisAddress ...
-const RedisAddress = "REDIS_ADDRESS"
+const RedisAddress = "redis.address"

@@ -8,6 +8,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minskylab/figport/config"
 	"github.com/minskylab/figport/figma"
+	"github.com/pkg/errors"
 
 	"github.com/spf13/viper"
 	"github.com/valyala/fastjson"
@@ -28,6 +29,19 @@ type Figport struct {
 }
 
 func (fig *Figport) Start() error {
+	fig.config.SetConfigName("figport.config.yaml")
+	fig.config.AddConfigPath("/etc/figport/")
+	fig.config.AddConfigPath(".")
+
+	if err := fig.config.ReadInConfig(); err != nil {
+		return errors.WithStack(err)
+	}
+
+	fig.config.SetEnvPrefix("figport")
+	fig.config.AutomaticEnv()
+
+	// fig.config.SetDefault(, value interface{})
+
 	port := fig.config.GetString(config.Port)
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port

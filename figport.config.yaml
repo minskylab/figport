@@ -1,0 +1,20 @@
+hostname: ""
+figport:
+  prefix: "figport"
+
+figma:
+  oauthbase: ""
+  clientid: ""
+  clientsecret: ""
+  redirecturi: ""
+
+s3:
+  endpoint: ""
+  accesskey: ""
+  secretkey: ""
+  usessl: ""
+  region: ""
+  bucket: ""
+
+redis:
+  address: "localhost:6379"
