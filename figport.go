@@ -21,4 +21,5 @@ type Figport struct {
 	s3Client   *minio.Client
 
 	figma figma.Figma
+	mods  []Mod
 }

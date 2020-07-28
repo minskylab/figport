@@ -3,6 +3,9 @@ package config
 // HostNameKey TODO: writedescription
 const HostNameKey = "HOSTNAME"
 
+// FigportPrefix the prefix to enable exportation in your figma file
+const FigportPrefix = "PREFIXTOEXPORT"
+
 //
 
 // FigmaOauthURL TODO: writedescription
