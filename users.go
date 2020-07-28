@@ -14,7 +14,7 @@ type user struct {
 }
 
 func (fig *Figport) figmaUserProfileByToken(token string) (*user, error) {
-	endpoint, err := fig.figmaURI("/v1/me")
+	endpoint, err := fig.figma.FigmaURI("/v1/me")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

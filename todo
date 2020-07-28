@@ -1,1 +1,2 @@
 TODO: Deatach the hardcoded api name (dynamic endpoints)
+TODO: Separate correctly the REST API and the business logic inside these

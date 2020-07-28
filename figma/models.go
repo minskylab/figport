@@ -2,7 +2,7 @@ package figma
 
 // File details is in Figma official API documentation
 type File struct {
-	Document      Node                 `json:"document"`
+	Document      Document             `json:"document"`
 	Components    map[string]Component `json:"components"`
 	SchemaVersion int64                `json:"schemaVersion"`
 	Styles        Styles               `json:"styles"`
@@ -23,16 +23,16 @@ type Component struct {
 // Styles details is in Figma official API documentation
 type Styles struct{}
 
-// Node details is in Figma official API documentation
-type Node struct {
-	ID       string          `json:"id"`
-	Name     string          `json:"name"`
-	Type     string          `json:"type"`
-	Children []DocumentChild `json:"children"`
+// Document details is in Figma official API documentation
+type Document struct {
+	ID       string   `json:"id"`
+	Name     string   `json:"name"`
+	Type     string   `json:"type"`
+	Children []Canvas `json:"children"`
 }
 
-// DocumentChild details is in Figma official API documentation
-type DocumentChild struct {
+// Canvas details is in Figma official API documentation
+type Canvas struct {
 	ID                   string          `json:"id"`
 	Name                 string          `json:"name"`
 	Type                 string          `json:"type"`

@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/gofiber/fiber"
+	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -32,8 +33,8 @@ func (fig *Figport) registerAuth() {
 
 		q := figmaAuthURL.Query()
 
-		q.Add("client_id", fig.config.GetString(figmaOauthURL))
-		q.Add("redirect_uri", fig.config.GetString(figmaRedirectURI))
+		q.Add("client_id", fig.config.GetString(config.FigmaOauthURL))
+		q.Add("redirect_uri", fig.config.GetString(config.FigmaRedirectURI))
 		q.Add("scope", "file_read")
 		q.Add("state", state)
 		q.Add("response_type", "code")
@@ -75,5 +76,7 @@ func (fig *Figport) registerAuth() {
 		// TODO: Implement a beauty user page response [200]
 
 		c.SendString("Welcome " + user.Email)
+
+		fig.destroyState(c.Context(), state)
 	})
 }

@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"path"
 
+	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
 )
 
@@ -16,7 +17,7 @@ type tokenResult struct {
 }
 
 func (fig *Figport) requestToken(code string) (*tokenResult, error) {
-	base := fig.config.GetString(figmaOauthURL)
+	base := fig.config.GetString(config.FigmaOauthURL)
 	u, err := url.Parse(base)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -25,9 +26,9 @@ func (fig *Figport) requestToken(code string) (*tokenResult, error) {
 
 	q := u.Query()
 
-	q.Add("client_id", fig.config.GetString(figmaOauthURL))
-	q.Add("redirect_uri", fig.config.GetString(figmaRedirectURI))
-	q.Add("client_secret", fig.config.GetString(figmaClientSecret))
+	q.Add("client_id", fig.config.GetString(config.FigmaOauthURL))
+	q.Add("redirect_uri", fig.config.GetString(config.FigmaRedirectURI))
+	q.Add("client_secret", fig.config.GetString(config.FigmaClientSecret))
 	q.Add("code", code)
 	q.Add("response_type", "authorization_code")
 

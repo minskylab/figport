@@ -6,16 +6,17 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 func (fig *Figport) getMinioClientFromConfig() *minio.Client {
-	s3Endpoint := fig.config.GetString(s3Endpoint)
-	s3AccessKeyID := fig.config.GetString(s3AccessKeyID)
-	s3SecretKey := fig.config.GetString(s3SecretKey)
-	s3UseSSL := fig.config.GetBool(s3UseSSL)
-	s3Region := fig.config.GetString(s3Region)
+	s3Endpoint := fig.config.GetString(config.S3Endpoint)
+	s3AccessKeyID := fig.config.GetString(config.S3AccessKeyID)
+	s3SecretKey := fig.config.GetString(config.S3SecretKey)
+	s3UseSSL := fig.config.GetBool(config.S3UseSSL)
+	s3Region := fig.config.GetString(config.S3Region)
 
 	client, err := minio.New(s3Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3AccessKeyID, s3SecretKey, ""),
@@ -33,7 +34,7 @@ func (fig *Figport) getMinioClientFromConfig() *minio.Client {
 }
 
 func (fig *Figport) saveAsset(ctx context.Context, path string, contentType string, file *os.File) (interface{}, error) {
-	bucket := fig.config.GetString(s3Bucket)
+	bucket := fig.config.GetString(config.S3Bucket)
 
 	bucketIsOk, err := fig.s3Client.BucketExists(ctx, bucket)
 	if err != nil {
