@@ -17,6 +17,8 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 
 	fig.config.SetDefault(config.PortKey, "8080")
 	fig.config.SetDefault(config.HostNameKey, "127.0.0.1")
+	fig.config.SetDefault(config.FigmaAPIBaseURL, "https://api.figma.com")
+	fig.config.SetDefault(config.FigmaOauthURL, "https://www.figma.com")
 
 	fig.config.SetEnvPrefix("FIGPORT")
 	fig.config.AutomaticEnv()

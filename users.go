@@ -2,43 +2,52 @@ package figport
 
 import (
 	"context"
-	"io/ioutil"
+	"encoding/json"
+	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type user struct {
-	ID     string
-	Handle string
-	Email  string
+	ID     string `json:"id"`
+	Handle string `json:"handle"`
+	Email  string `json:"email"`
 }
 
-func (fig *Figport) figmaUserProfileByToken(token string) (*user, error) {
-	endpoint, err := fig.figma.FigmaURI("/v1/me")
+func (fig *Figport) figmaUserProfileByToken(accessToken string) (*user, error) {
+	endpoint, err := fig.figma.FigmaAPIURI("/v1/me")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	res, err := fig.httpClient.Get(endpoint)
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	data, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
+	req.Header.Add("Authorization", "Bearer "+accessToken)
 
-	values, err := fig.jsonParser.ParseBytes(data)
+	res, err := fig.httpClient.Do(req)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	returnedUser := new(user)
 
-	returnedUser.ID = string(values.GetStringBytes("id"))
-	returnedUser.Email = string(values.GetStringBytes("email"))
-	returnedUser.Handle = string(values.GetStringBytes("handle"))
+	if err := json.NewDecoder(res.Body).Decode(returnedUser); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if returnedUser.ID == "" {
+		return nil, errors.New("invalid response from figma api")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"id":     returnedUser.ID,
+		"handle": returnedUser.Handle,
+		"email":  returnedUser.Email,
+	}).Debug("figma user profile response received")
 
 	return returnedUser, nil
 }

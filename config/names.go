@@ -14,6 +14,9 @@ const DebugKey = "figport.debug"
 
 //
 
+// FigmaAPIBaseURL ...
+const FigmaAPIBaseURL = "figma.apibase"
+
 // FigmaOauthURL TODO: writedescription
 const FigmaOauthURL = "figma.oauthbase"
 

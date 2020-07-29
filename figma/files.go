@@ -12,11 +12,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/valyala/fastjson"
 )
 
 func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...string) (*File, error) {
-	endpoint, err := fig.figmaURI("/v1/files", fileKey)
+	endpoint, err := fig.FigmaAPIURI("/v1/files", fileKey)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -26,7 +25,7 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...
 		return nil, errors.WithStack(err)
 	}
 
-	req.Header.Add("X-FIGMA-TOKEN", accessToken)
+	req.Header.Add("Authorization", "Bearer "+accessToken)
 
 	res, err := fig.httpClient.Do(req)
 	if err != nil {
@@ -41,9 +40,9 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...
 	return file, nil
 }
 
-// TODO: Fix the hardcoded names (e.g. X-FIGMA-TOKEN)
+// TODO: Fix the hardcoded names (e.g. Authorization, Bearer)
 func (fig *Figma) renderImageFromNode(accessToken string, fileKey string, nodes []string, options RenderOptions) (*Render, error) {
-	endpoint, err := fig.figmaURI("/v1/images", fileKey)
+	endpoint, err := fig.FigmaAPIURI("/v1/images", fileKey)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -69,39 +68,20 @@ func (fig *Figma) renderImageFromNode(accessToken string, fileKey string, nodes 
 		return nil, errors.WithStack(err)
 	}
 
-	req.Header.Add("X-FIGMA-TOKEN", accessToken)
+	req.Header.Add("Authorization", "Bearer "+accessToken)
 
 	res, err := fig.httpClient.Do(req)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	data, err := ioutil.ReadAll(res.Body)
-	if err != nil {
+	render := new(Render)
+
+	if err := json.NewDecoder(res.Body).Decode(render); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	values, err := fig.jsonParser.ParseBytes(data)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	image := map[string]string{}
-	values.GetObject("images").Visit(func(key []byte, v *fastjson.Value) {
-		if v != nil {
-			image[string(key)] = v.String()
-		}
-	})
-
-	figmaError := values.GetStringBytes("err")
-
-	status := values.GetFloat64("status")
-
-	return &Render{
-		Err:    string(figmaError),
-		Images: image,
-		Status: status,
-	}, nil
+	return render, nil
 }
 
 func (fig *Figma) downloadFromFigmaRender(imageURL string) (*os.File, string, error) {

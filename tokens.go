@@ -1,7 +1,7 @@
 package figport
 
 import (
-	"io/ioutil"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"path"
@@ -12,9 +12,9 @@ import (
 )
 
 type tokenResult struct {
-	AccessToken  string
-	Expiration   string
-	RefreshToken string
+	AccessToken  string `json:"access_token"`
+	Expiration   int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func (fig *Figport) requestToken(code string) (*tokenResult, error) {
@@ -31,7 +31,7 @@ func (fig *Figport) requestToken(code string) (*tokenResult, error) {
 	q.Add("redirect_uri", fig.config.GetString(config.FigmaRedirectURI))
 	q.Add("client_secret", fig.config.GetString(config.FigmaClientSecret))
 	q.Add("code", code)
-	q.Add("response_type", "authorization_code")
+	q.Add("grant_type", "authorization_code")
 
 	u.RawQuery = q.Encode()
 
@@ -45,32 +45,17 @@ func (fig *Figport) requestToken(code string) (*tokenResult, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	data, err := ioutil.ReadAll(res.Body)
-	if err != nil {
+	tResult := new(tokenResult)
+	if err := json.NewDecoder(res.Body).Decode(tResult); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	contentType := res.Header.Get("Content-Type")
 
 	logrus.WithFields(logrus.Fields{
-		"uri":         u.String(),
 		"statusCode":  res.StatusCode,
-		"contentType": res.Header.Get("Content-Type"),
-		"bodyLength":  len(data),
-	}).Debug("figma response from /oauth/token")
+		"contentType": contentType,
+	}).Debug("figma response from /api/oauth/token")
 
-	vals, err := fig.jsonParser.ParseBytes(data)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	// TODO: Save refresh and expiration
-
-	accessToken := vals.GetStringBytes("access_token")
-	expiration := vals.GetStringBytes("expires_in")
-	refreshToken := vals.GetStringBytes("refresh_token")
-
-	return &tokenResult{
-		AccessToken:  string(accessToken),
-		Expiration:   string(expiration),
-		RefreshToken: string(refreshToken),
-	}, nil
+	return tResult, nil
 }

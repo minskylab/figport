@@ -8,8 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (fig *Figma) figmaURI(paths ...string) (string, error) {
-	base := fig.config.GetString(config.FigmaOauthURL)
+func (fig *Figma) figmaURI(base string, paths ...string) (string, error) {
 	u, err := url.Parse(base)
 	if err != nil {
 		return "", errors.WithStack(err)
@@ -21,5 +20,12 @@ func (fig *Figma) figmaURI(paths ...string) (string, error) {
 
 // FigmaURI only esports figmaURI utility
 func (fig *Figma) FigmaURI(paths ...string) (string, error) {
-	return fig.figmaURI(paths...)
+	base := fig.config.GetString(config.FigmaOauthURL)
+	return fig.figmaURI(base, paths...)
+}
+
+// FigmaAPIURI uses the api base insted to oauth base
+func (fig *Figma) FigmaAPIURI(paths ...string) (string, error) {
+	base := fig.config.GetString(config.FigmaAPIBaseURL)
+	return fig.figmaURI(base, paths...)
 }

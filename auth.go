@@ -11,7 +11,7 @@ import (
 )
 
 func sendError(c *fiber.Ctx, err error) {
-	logrus.Error(err.Error())
+	logrus.Errorf("%#v", err)
 	c.JSON(map[string]string{
 		"error": err.Error(),
 	})
@@ -53,7 +53,7 @@ func (fig *Figport) registerAuth() {
 		state := c.Query("state", "")
 
 		logrus.WithFields(logrus.Fields{
-			"code":  code[:5] + "***...",
+			"code":  code[:5] + "***",
 			"state": state,
 		}).Debug("oauth callback triggered")
 
@@ -65,8 +65,6 @@ func (fig *Figport) registerAuth() {
 			return
 		}
 
-		logrus.Debug("code ready")
-
 		token, err := fig.requestToken(code)
 		if err != nil {
 			sendError(c, errors.WithStack(err))
@@ -76,6 +74,7 @@ func (fig *Figport) registerAuth() {
 		user, err := fig.registerNewUser(c.Context(), token)
 		if err != nil {
 			sendError(c, errors.WithStack(err))
+			return
 		}
 
 		// TODO: Implement a beauty user page response [200]
