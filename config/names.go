@@ -6,8 +6,11 @@ const HostNameKey = "hostname"
 // FigportPrefix the prefix to enable exportation in your figma file
 const FigportPrefix = "figport.prefix"
 
-// Port is port
-const Port = "port"
+// PortKey is port
+const PortKey = "port"
+
+// DebugKey ...
+const DebugKey = "figport.debug"
 
 //
 

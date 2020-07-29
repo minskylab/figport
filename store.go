@@ -26,14 +26,6 @@ func getMinioClientOptionsFromConfig(conf *viper.Viper) *s3storageOptions {
 	s3UseSSL := conf.GetBool(config.S3UseSSL)
 	s3Region := conf.GetString(config.S3Region)
 
-	logrus.WithFields(logrus.Fields{
-		"s3Endpoint":    s3Endpoint,
-		"s3AccessKeyID": s3AccessKeyID,
-		"s3SecretKey":   s3SecretKey,
-		"s3UseSSL":      s3UseSSL,
-		"s3Region":      s3Region,
-	}).Debug("establishment s3 connection")
-
 	return &s3storageOptions{
 		Endpoint:    s3Endpoint,
 		AccessKeyID: s3AccessKeyID,

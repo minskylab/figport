@@ -46,8 +46,6 @@ func NewDefault(ctx context.Context, withToken bool) (*Figport, error) {
 
 	fiberApp := fiber.New()
 
-	s3Options := getMinioClientOptionsFromConfig(viper)
-
 	return &Figport{
 		withToken:  withToken,
 		jsonParser: jsonParser,
@@ -57,6 +55,5 @@ func NewDefault(ctx context.Context, withToken bool) (*Figport, error) {
 		httpClient: httpClient,
 		mods:       defaultMods,
 		server:     fiberApp,
-		s3Options:  s3Options,
 	}, nil
 }
