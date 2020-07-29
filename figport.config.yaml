@@ -1,5 +1,6 @@
-hostname: ""
+hostname: "figport.dev.minsky.cc"
 figport:
+  debug: true
   prefix: "figport"
 
 figma:
@@ -9,12 +10,12 @@ figma:
   redirecturi: ""
 
 s3:
-  endpoint: ""
-  accesskey: ""
-  secretkey: ""
-  usessl: ""
-  region: ""
-  bucket: ""
+  endpoint: "http://192.168.8.135:9000"
+  accesskey: "minioadmin"
+  secretkey: "minioadmin"
+  usessl: false
+  region: us-east-1
+  bucket: figport
 
 redis:
   address: "localhost:6379"
