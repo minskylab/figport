@@ -42,6 +42,9 @@ func NewDefault(ctx context.Context) (*Figport, error) {
 
 	defaultMods := []Mod{
 		&mods.SVGMod{},
+		&mods.PNGMod{},
+		&mods.JPGMod{},
+		&mods.PDFMod{},
 	}
 
 	fiberApp := fiber.New()

@@ -20,7 +20,7 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...
 		return nil, errors.WithStack(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, endpoint, nil)
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -67,7 +67,7 @@ func (fig *Figma) renderImageFromNode(accessToken string, fileKey string, nodes 
 
 	uri.RawQuery = query.Encode()
 
-	req, err := http.NewRequest(http.MethodPost, uri.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, uri.String(), nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

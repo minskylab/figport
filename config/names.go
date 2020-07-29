@@ -32,6 +32,9 @@ const FigmaRedirectURI = "figma.redirecturi"
 // FigmaToken TODO: writedescription
 const FigmaToken = "figma.token"
 
+// FigmaDefaultFile TODO: writedescription
+const FigmaDefaultFile = "figma.defaultfile"
+
 //
 
 // S3Endpoint TODO: writedescription

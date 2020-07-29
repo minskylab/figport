@@ -47,7 +47,7 @@ func (fig *Figport) saveAsset(ctx context.Context, path string, contentType stri
 		return nil, errors.New("your bucket not exist, aborting saving operation")
 	}
 
-	info, err := fig.s3Client.PutObject(ctx, bucket, path, file, -1, minio.PutObjectOptions{
+	info, err := fig.s3Client.FPutObject(ctx, bucket, path, file.Name(), minio.PutObjectOptions{
 		UserMetadata: map[string]string{
 			"uploader": "figport agent",
 		},
