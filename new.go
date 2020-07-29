@@ -16,7 +16,7 @@ import (
 )
 
 // NewDefault ...
-func NewDefault(ctx context.Context, withToken bool) (*Figport, error) {
+func NewDefault(ctx context.Context) (*Figport, error) {
 	viper := viper.New()
 	httpClient := &http.Client{
 		Timeout: 15 * time.Second,
@@ -47,7 +47,6 @@ func NewDefault(ctx context.Context, withToken bool) (*Figport, error) {
 	fiberApp := fiber.New()
 
 	return &Figport{
-		withToken:  withToken,
 		jsonParser: jsonParser,
 		config:     viper,
 		db:         database,

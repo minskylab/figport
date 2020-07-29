@@ -20,7 +20,7 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 	fig.config.SetDefault(config.FigmaAPIBaseURL, "https://api.figma.com")
 	fig.config.SetDefault(config.FigmaOauthURL, "https://www.figma.com")
 
-	fig.config.SetEnvPrefix("FIGPORT")
+	fig.config.SetEnvPrefix("figport")
 	fig.config.AutomaticEnv()
 
 	if err := fig.config.ReadInConfig(); err != nil {
@@ -33,7 +33,17 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
-	logrus.WithField("debug", debugMode).Info("configuration bootstrap done")
+	token := fig.config.GetString(config.FigmaToken)
+	if token != "" {
+		fig.withToken = true
+	} else {
+		fig.withToken = false
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"debug":         debugMode,
+		"personalToken": fig.withToken,
+	}).Info("configuration bootstrap done")
 
 	return nil
 }

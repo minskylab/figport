@@ -25,7 +25,11 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...
 		return nil, errors.WithStack(err)
 	}
 
-	req.Header.Add("Authorization", "Bearer "+accessToken)
+	if len(accessToken) > 40 { // Personal Access Token
+		req.Header.Add("X-FIGMA-TOKEN", accessToken)
+	} else { // OAuth generated Token
+		req.Header.Add("Authorization", "Bearer "+accessToken)
+	}
 
 	res, err := fig.httpClient.Do(req)
 	if err != nil {
@@ -40,7 +44,7 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...
 	return file, nil
 }
 
-// TODO: Fix the hardcoded names (e.g. Authorization, Bearer)
+// TODO: Fix the hardcoded names
 func (fig *Figma) renderImageFromNode(accessToken string, fileKey string, nodes []string, options RenderOptions) (*Render, error) {
 	endpoint, err := fig.FigmaAPIURI("/v1/images", fileKey)
 	if err != nil {
@@ -68,7 +72,11 @@ func (fig *Figma) renderImageFromNode(accessToken string, fileKey string, nodes 
 		return nil, errors.WithStack(err)
 	}
 
-	req.Header.Add("Authorization", "Bearer "+accessToken)
+	if len(accessToken) > 40 { // Personal Access Token
+		req.Header.Add("X-FIGMA-TOKEN", accessToken)
+	} else { // OAuth generated Token
+		req.Header.Add("Authorization", "Bearer "+accessToken)
+	}
 
 	res, err := fig.httpClient.Do(req)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	figport, err := figport.NewDefault(context.Background(), true)
+	figport, err := figport.NewDefault(context.Background())
 	if err != nil {
 		logrus.Panic(err.Error())
 	}

@@ -26,7 +26,11 @@ func (fig *Figport) figmaUserProfileByToken(accessToken string) (*user, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	req.Header.Add("Authorization", "Bearer "+accessToken)
+	if len(accessToken) > 40 { // Personal Access Token
+		req.Header.Add("X-FIGMA-TOKEN", accessToken)
+	} else { // OAuth generated Token
+		req.Header.Add("Authorization", "Bearer "+accessToken)
+	}
 
 	res, err := fig.httpClient.Do(req)
 	if err != nil {
