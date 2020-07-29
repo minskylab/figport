@@ -33,7 +33,7 @@ func (fig *Figport) registerAuth() {
 
 		q := figmaAuthURL.Query()
 
-		q.Add("client_id", fig.config.GetString(config.FigmaOauthURL))
+		q.Add("client_id", fig.config.GetString(config.FigmaAppClientID))
 		q.Add("redirect_uri", fig.config.GetString(config.FigmaRedirectURI))
 		q.Add("scope", "file_read")
 		q.Add("state", state)
@@ -49,10 +49,13 @@ func (fig *Figport) registerAuth() {
 		body := c.Body()
 		logrus.Info(body)
 
-		code := c.Query("code", "")
+		code := c.Query("code", "00000000")
 		state := c.Query("state", "")
 
-		logrus.Info(code, state)
+		logrus.WithFields(logrus.Fields{
+			"code":  code[:5] + "***...",
+			"state": state,
+		}).Debug("oauth callback triggered")
 
 		// fig.config.GetString(hostNameKey)
 
@@ -61,6 +64,8 @@ func (fig *Figport) registerAuth() {
 			sendError(c, errors.WithStack(err))
 			return
 		}
+
+		logrus.Debug("code ready")
 
 		token, err := fig.requestToken(code)
 		if err != nil {

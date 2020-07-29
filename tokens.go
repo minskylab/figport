@@ -8,6 +8,7 @@ import (
 
 	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type tokenResult struct {
@@ -22,11 +23,11 @@ func (fig *Figport) requestToken(code string) (*tokenResult, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	u.Path = path.Join(u.Path, "/token")
+	u.Path = path.Join(u.Path, "/api/oauth/token")
 
 	q := u.Query()
 
-	q.Add("client_id", fig.config.GetString(config.FigmaOauthURL))
+	q.Add("client_id", fig.config.GetString(config.FigmaAppClientID))
 	q.Add("redirect_uri", fig.config.GetString(config.FigmaRedirectURI))
 	q.Add("client_secret", fig.config.GetString(config.FigmaClientSecret))
 	q.Add("code", code)
@@ -48,6 +49,13 @@ func (fig *Figport) requestToken(code string) (*tokenResult, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"uri":         u.String(),
+		"statusCode":  res.StatusCode,
+		"contentType": res.Header.Get("Content-Type"),
+		"bodyLength":  len(data),
+	}).Debug("figma response from /oauth/token")
 
 	vals, err := fig.jsonParser.ParseBytes(data)
 	if err != nil {

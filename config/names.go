@@ -26,6 +26,9 @@ const FigmaClientSecret = "figma.clientsecret"
 // FigmaRedirectURI TODO: writedescription
 const FigmaRedirectURI = "figma.redirecturi"
 
+// FigmaToken TODO: writedescription
+const FigmaToken = "figma.token"
+
 //
 
 // S3Endpoint TODO: writedescription
