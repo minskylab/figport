@@ -3,13 +3,10 @@ package figport
 
 import "crypto/rand"
 
+
 const stdChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
-func newRandomString() string {
-	return newRandomStringLenChars(20, []byte(stdChars))
-}
-
-func newRandomStringLen(length int) string {
+func newRandomString(length int) string {
 	return newRandomStringLenChars(length, []byte(stdChars))
 }
 

@@ -23,6 +23,8 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 	fig.config.SetDefault(config.FigmaOauthURL, "https://www.figma.com")
 	fig.config.SetDefault(config.FigportPrefix, "figport")
 
+	fig.config.SetDefault(config.RedisAddress, "localhost:6379")
+
 	fig.config.SetEnvPrefix("figport")
 	fig.config.AutomaticEnv()
 	fig.config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -46,7 +48,11 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 
 	globalSecret := fig.config.GetString(config.GlobalSecret)
 	if globalSecret == "" {
-		secret := newRandomString()
+		logrus.Info("global secret not manually choose")
+		logrus.Info("generating a new random global secret")
+		secret := newRandomString(config.DefaultSecretSize)
+		logrus.Infof("global secret: \"%s\"", secret)
+		logrus.Warn("that's is dangerous, try to set your own global secret by env variables ot yaml config")
 		fig.config.Set(config.GlobalSecret, secret)
 	}
 

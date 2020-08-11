@@ -9,7 +9,7 @@ import (
 
 func (fig *Figport) runServer() error {
 	fig.registerAuth()
-	fig.registerWebhooks()
+	fig.registerDeploy()
 
 	port := fig.config.GetString(config.PortKey)
 	if !strings.HasPrefix(port, ":") {

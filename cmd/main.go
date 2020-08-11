@@ -8,9 +8,10 @@ import (
 )
 
 func main() {
-	exporter, err := figport.NewDefault(context.Background())
+	exporter, err := figport.New(context.Background())
 	if err != nil {
 		logrus.Panic(err.Error())
+		return
 	}
 
 	if err := exporter.Start(); err != nil {

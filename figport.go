@@ -9,13 +9,11 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/spf13/viper"
-	"github.com/valyala/fastjson"
 )
 
 // Figport is a struct to wrap all dependencies of Figport
 type Figport struct {
 	withToken  bool
-	jsonParser *fastjson.Parser
 	httpClient *http.Client
 	config     *viper.Viper
 	server     *fiber.App

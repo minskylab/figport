@@ -108,7 +108,7 @@ func (mod *JPGMod) Process(opts exporting.ExportNodeOptions, params map[string]s
 type PDFMod struct{}
 
 func (mod *PDFMod) Name() string {
-	return "jpg"
+	return "pdf"
 }
 
 func (mod *PDFMod) Params() map[string]string {

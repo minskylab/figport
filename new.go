@@ -12,25 +12,17 @@ import (
 	"github.com/minskylab/figport/mods"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/valyala/fastjson"
 )
 
-// NewDefault ...
-func NewDefault(ctx context.Context) (*Figport, error) {
+// New ...
+func New(ctx context.Context) (*Figport, error) {
 	conf := viper.New()
 	httpClient := &http.Client{
 		Timeout: 15 * time.Second,
 	}
 
-	address := "localhost:6379"
-	if addr := conf.GetString(config.FigmaRedirectURI); addr != "" {
-		address = addr
-	}
-
-	jsonParser := &fastjson.Parser{}
-
 	database, err := newDatabase(ctx, &redis.Options{
-		Addr:     address,
+		Addr:     conf.GetString(config.RedisAddress),
 		Password: "",
 		DB:       0,
 	})
@@ -38,7 +30,7 @@ func NewDefault(ctx context.Context) (*Figport, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	figmaHandler := figma.New(conf, httpClient, jsonParser)
+	figmaHandler := figma.New(conf, httpClient)
 
 	defaultMods := []Mod{
 		&mods.SVGMod{},
@@ -50,7 +42,6 @@ func NewDefault(ctx context.Context) (*Figport, error) {
 	fiberApp := fiber.New()
 
 	return &Figport{
-		jsonParser: jsonParser,
 		config:     conf,
 		db:         database,
 		figma:      figmaHandler,

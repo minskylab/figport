@@ -59,7 +59,7 @@ func (fig *Figport) saveAsset(ctx context.Context, path string, contentType stri
 		return nil, errors.WithStack(err)
 	}
 
-	logrus.WithField("location", info.Location).Info("saved asset to s3 storage")
+	logrus.WithField("location", info.Bucket).Info("saved asset to s3 storage")
 
 	return nil, nil
 }
