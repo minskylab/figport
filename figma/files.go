@@ -58,8 +58,17 @@ func (fig *Figma) renderImageFromNode(accessToken string, fileKey string, nodes 
 
 	query := uri.Query()
 
+	if options.Scale == 0.0 {
+		options.Scale = 1.0
+	}
+
+	if options.Scale < 0.0 {
+		options.Scale *= -1
+	}
+
 	query.Add("ids", strings.Join(nodes, ","))
 	query.Add("format", string(options.Format))
+	query.Add("scale", strconv.FormatFloat(options.Scale, 'f', -1, 64))
 	query.Add("svg_include_id", strconv.FormatBool(options.SVGIncludeID))
 	query.Add("svg_simplify_stroke", strconv.FormatBool(options.SVGSimplifyStroke))
 	query.Add("use_absolute_bounds", strconv.FormatBool(options.UseAbsoluteBounds))

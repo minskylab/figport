@@ -13,8 +13,8 @@ import (
 )
 
 func (fig *Figport) processNodeName(nodeName string) exporting.ExportNodeOptions {
-	activeMods := []string{}
-	activeScales := []float64{}
+	var activeMods []string
+	var activeScales []float64
 	path := nodeName
 
 	nodeName = strings.TrimSpace(nodeName)
@@ -70,7 +70,7 @@ func (fig *Figport) extractParamsFromModName(name string) (map[string]string, er
 	for _, pair := range pairs {
 		nameValue := strings.Split(pair, "=")
 		if len(nameValue) != 2 {
-			return nil, errors.New("invalid param, please especify the name and the value in the form 'name=value'")
+			return nil, errors.New("invalid param, please specify the name and the value in the form 'name=value'")
 		}
 		finalParams[nameValue[0]] = nameValue[1]
 	}
@@ -90,6 +90,31 @@ func (fig *Figport) getModIfIsActive(mods []string, activeMod string) string {
 func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string) error {
 	exportingOptions := fig.processNodeName(nodeName)
 
+	prefix := fig.config.GetString(config.FigportPrefix)
+	if prefix == "" {
+		return errors.New("invalid prefix for enable your exports")
+	}
+
+	// To always add minimum @1 scale
+	if len(exportingOptions.Scales) == 0 {
+		exportingOptions.Scales = []float64{1.0}
+	}
+
+	// If we have more scale (e.g. [2.0]), that's if for always
+	// have the basic scale (e.g. [1.0, 2.0]).
+	if len(exportingOptions.Scales) > 0 {
+		hasUnitScale := false
+		for _, scale := range exportingOptions.Scales {
+			if scale == 1.0 {
+				hasUnitScale = true
+				break
+			}
+		}
+		if !hasUnitScale {
+			exportingOptions.Scales = append(exportingOptions.Scales, 1.0)
+		}
+	}
+
 	logrus.WithFields(logrus.Fields{
 		"filename": exportingOptions.Filename,
 		"mods":     exportingOptions.Mods,
@@ -97,11 +122,6 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 		"path":     exportingOptions.Path,
 		"raw":      exportingOptions.Raw,
 	}).Debug("processing export naming")
-
-	prefix := fig.config.GetString(config.FigportPrefix)
-	if prefix == "" {
-		return errors.New("invalid prefix for enable your exportations")
-	}
 
 	for _, activeMod := range fig.mods {
 		modDescriptor := fig.getModIfIsActive(exportingOptions.Mods, activeMod.Name())
@@ -169,25 +189,32 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 
 	prefix := fig.config.GetString(config.FigportPrefix)
 	if prefix == "" {
-		return errors.New("invalid prefix for enable your exportations")
+		return errors.New("invalid prefix for enable your exports")
 	}
 
-	for _, artboard := range figmaFile.Document.Children {
-		name := strings.ReplaceAll(artboard.Name, " ", "")
-		toExport := strings.HasPrefix(name, prefix)
-
-		if !toExport {
-			continue
-		}
-
-		logrus.WithFields(logrus.Fields{
-			"name": name,
-		}).Debug("reading artboard")
-
-		if err := fig.deployNode(ctx, accessToken, fileKey, artboard.ID, name); err != nil {
-			return errors.WithStack(err)
-		}
-	}
+	// Deprecated code, at the alpha stage I'm only need extract the components
+	//
+	// for _, page := range figmaFile.Document.Children {
+	// 	name := strings.ReplaceAll(page.Name, " ", "")
+	// 	logrus.Debug("name= ", name, ", page.Type= ", page.Type, ", prefix= ", prefix)
+	//
+	// 	for _, artboard := range page.Children {
+	// 		name := strings.ReplaceAll(artboard.Name, " ", "")
+	// 		toExport := strings.HasPrefix(name, prefix)
+	// 		if !toExport {
+	// 			continue
+	// 		}
+	//
+	// 		logrus.WithFields(logrus.Fields{
+	// 			"name": name,
+	// 		}).Debug("reading artboard")
+	//
+	// 		if err := fig.deployNode(ctx, accessToken, fileKey, page.ID, name); err != nil {
+	// 			return errors.WithStack(err)
+	// 		}
+	// 	}
+	//
+	// }
 
 	for nodeID, componentInfo := range figmaFile.Components {
 		name := strings.ReplaceAll(componentInfo.Name, " ", "")
