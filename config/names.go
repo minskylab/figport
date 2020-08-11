@@ -12,6 +12,9 @@ const PortKey = "port"
 // DebugKey ...
 const DebugKey = "figport.debug"
 
+// GlobalSecret ...
+const GlobalSecret = "figport.globalsecret"
+
 //
 
 // FigmaAPIBaseURL ...
@@ -59,3 +62,6 @@ const S3Bucket = "s3.bucket"
 
 // RedisAddress ...
 const RedisAddress = "redis.address"
+
+//
+

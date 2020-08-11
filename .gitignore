@@ -2,3 +2,4 @@ figport
 .env
 temporal/
 *.rdb
+.idea/

@@ -1,6 +1,8 @@
 package figport
 
 import (
+	"strings"
+
 	"github.com/joho/godotenv"
 	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
@@ -8,7 +10,7 @@ import (
 )
 
 func (fig *Figport) bootstrapDefaultConfig() error {
-	godotenv.Load()
+	_ = godotenv.Load()
 
 	fig.config.SetConfigName("figport.config")
 	fig.config.SetConfigType("yaml")
@@ -23,6 +25,7 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 
 	fig.config.SetEnvPrefix("figport")
 	fig.config.AutomaticEnv()
+	fig.config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	if err := fig.config.ReadInConfig(); err != nil {
 		return errors.WithStack(err)
@@ -39,6 +42,12 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 		fig.withToken = true
 	} else {
 		fig.withToken = false
+	}
+
+	globalSecret := fig.config.GetString(config.GlobalSecret)
+	if globalSecret == "" {
+		secret := newRandomString()
+		fig.config.Set(config.GlobalSecret, secret)
 	}
 
 	logrus.WithFields(logrus.Fields{

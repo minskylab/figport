@@ -12,7 +12,7 @@ func (fig *Figport) connectS3() error {
 
 	logrus.WithFields(logrus.Fields{
 		"s3Endpoint": s3Options.Endpoint,
-	}).Info("s3 connection establishment")
+	}).Info("establishment s3 connection")
 
 	client, err := minio.New(s3Options.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3Options.AccessKeyID, s3Options.SecretKey, ""),

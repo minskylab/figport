@@ -17,13 +17,13 @@ import (
 
 // NewDefault ...
 func NewDefault(ctx context.Context) (*Figport, error) {
-	viper := viper.New()
+	conf := viper.New()
 	httpClient := &http.Client{
 		Timeout: 15 * time.Second,
 	}
 
 	address := "localhost:6379"
-	if addr := viper.GetString(config.FigmaRedirectURI); addr != "" {
+	if addr := conf.GetString(config.FigmaRedirectURI); addr != "" {
 		address = addr
 	}
 
@@ -38,7 +38,7 @@ func NewDefault(ctx context.Context) (*Figport, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	figmaHandler := figma.New(viper, httpClient, jsonParser)
+	figmaHandler := figma.New(conf, httpClient, jsonParser)
 
 	defaultMods := []Mod{
 		&mods.SVGMod{},
@@ -51,7 +51,7 @@ func NewDefault(ctx context.Context) (*Figport, error) {
 
 	return &Figport{
 		jsonParser: jsonParser,
-		config:     viper,
+		config:     conf,
 		db:         database,
 		figma:      figmaHandler,
 		httpClient: httpClient,

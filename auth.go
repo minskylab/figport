@@ -12,7 +12,7 @@ import (
 
 func sendError(c *fiber.Ctx, err error) {
 	logrus.Errorf("%#v", err)
-	c.JSON(map[string]string{
+	_ = c.JSON(map[string]string{
 		"error": err.Error(),
 	})
 }
@@ -81,6 +81,9 @@ func (fig *Figport) registerAuth() {
 
 		c.SendString("Welcome " + user.Email)
 
-		fig.destroyState(c.Context(), state)
+		if err = fig.destroyState(c.Context(), state); err != nil {
+			sendError(c, errors.WithStack(err))
+			return
+		}
 	})
 }

@@ -21,7 +21,7 @@ func (mod *SVGMod) Params() map[string]string {
 }
 
 func (mod *SVGMod) Process(opts exporting.ExportNodeOptions, params map[string]string) ([]figma.RenderOptions, error) {
-	scales := []float64{}
+	scales := make([]float64, 0 )
 	if len(opts.Scales) == 0 {
 		scales = append(scales, 1.0)
 	} else {
@@ -31,7 +31,7 @@ func (mod *SVGMod) Process(opts exporting.ExportNodeOptions, params map[string]s
 	includeID, _ := strconv.ParseBool(params["includeID"])
 	simplifyStroke, _ := strconv.ParseBool(params["simplifyStroke"])
 
-	renders := []figma.RenderOptions{}
+	renders := make([]figma.RenderOptions, 0)
 
 	for _, scale := range scales {
 		renders = append(renders, figma.RenderOptions{
@@ -56,14 +56,14 @@ func (mod *PNGMod) Params() map[string]string {
 }
 
 func (mod *PNGMod) Process(opts exporting.ExportNodeOptions, params map[string]string) ([]figma.RenderOptions, error) {
-	scales := []float64{}
+	scales := make([]float64, 0)
 	if len(opts.Scales) == 0 {
 		scales = append(scales, 1.0)
 	} else {
 		scales = opts.Scales
 	}
 
-	renders := []figma.RenderOptions{}
+	renders := make([]figma.RenderOptions, 0)
 
 	for _, scale := range scales {
 		renders = append(renders, figma.RenderOptions{
@@ -86,14 +86,14 @@ func (mod *JPGMod) Params() map[string]string {
 }
 
 func (mod *JPGMod) Process(opts exporting.ExportNodeOptions, params map[string]string) ([]figma.RenderOptions, error) {
-	scales := []float64{}
+	scales := make([]float64, 0)
 	if len(opts.Scales) == 0 {
 		scales = append(scales, 1.0)
 	} else {
 		scales = opts.Scales
 	}
 
-	renders := []figma.RenderOptions{}
+	renders := make([]figma.RenderOptions, 0)
 
 	for _, scale := range scales {
 		renders = append(renders, figma.RenderOptions{
@@ -116,14 +116,14 @@ func (mod *PDFMod) Params() map[string]string {
 }
 
 func (mod *PDFMod) Process(opts exporting.ExportNodeOptions, params map[string]string) ([]figma.RenderOptions, error) {
-	scales := []float64{}
+	scales := make([]float64, 0)
 	if len(opts.Scales) == 0 {
 		scales = append(scales, 1.0)
 	} else {
 		scales = opts.Scales
 	}
 
-	renders := []figma.RenderOptions{}
+	renders := make([]figma.RenderOptions, 0)
 
 	for _, scale := range scales {
 		renders = append(renders, figma.RenderOptions{

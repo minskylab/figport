@@ -32,7 +32,7 @@ func (fig *Figport) validateState(ctx context.Context, state string) error {
 		return errors.WithStack(err)
 	}
 
-	if time.Now().Sub(issuedTime).Seconds() > 15 {
+	if time.Since(issuedTime).Seconds() > 20 {
 		return errors.New("your state value expire")
 	}
 

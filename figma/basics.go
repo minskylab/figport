@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// ObtainImage obtein a node from your fileKey and generate a os.file ready to pipeline to another place
+// ObtainImage obtain a node from your fileKey and generate a os.file ready to pipeline to another place
 // Note that the strategy used in this algorithm is one request per one node, Fimga's API provide a render
 // with multiple node but in this case I think is better make one by one because in this form we can inject
 // processors and generate sub-renders in the future.
