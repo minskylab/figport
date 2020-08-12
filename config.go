@@ -52,7 +52,7 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 		logrus.Info("generating a new random global secret")
 		secret := newRandomString(config.DefaultSecretSize)
 		logrus.Infof("global secret: \"%s\"", secret)
-		logrus.Warn("that's is dangerous, try to set your own global secret by env variables ot yaml config")
+		logrus.Warn("that's so dangerous, try to set your own global secret by env variables ot yaml config")
 		fig.config.Set(config.GlobalSecret, secret)
 	}
 

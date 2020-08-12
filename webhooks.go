@@ -1,6 +1,7 @@
 package figport
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gofiber/fiber"
 	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
@@ -29,10 +30,25 @@ func (fig *Figport) registerDeploy() {
 			"fileKey": fileKey,
 		}).Info("deploying figma file")
 
-		if err := fig.executeDeployment(c.Context(), accessToken, fileKey); err != nil {
+		var totalReports []nodeDeploymentReport
+
+		report := make(chan nodeDeploymentReport, 10)
+
+		if err := fig.executeDeployment(c.Context(), accessToken, fileKey, report); err != nil {
 			sendError(c, errors.WithStack(err))
 			return
 		}
+
+		for {
+			r, ok := <- report
+			if !ok {
+				break
+			}
+			spew.Dump(r)
+			totalReports = append(totalReports, r)
+		}
+
+		_ = c.JSON(totalReports)
 
 		logrus.Info("deployment executed")
 	})

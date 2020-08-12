@@ -5,12 +5,24 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+
+	"sync"
 
 	"github.com/minskylab/figport/config"
 	"github.com/minskylab/figport/exporting"
+	"github.com/minskylab/figport/figma"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
+
+type nodeDeploymentReport struct {
+	DeployAt            time.Time `json:"deployAt"`
+	TotalRenders        int64 `json:"totalRenders"`
+	TotalRendersSuccess int64 `json:"totalRendersSuccess"`
+	TotalRendersFailed  int64    `json:"totalRendersFailed"`
+	Renders             []string `json:"renders"` // TODO: Improve this Renders with a better struct (out of alpha)
+}
 
 func (fig *Figport) processNodeName(nodeName string) exporting.ExportNodeOptions {
 	var activeMods []string
@@ -87,12 +99,86 @@ func (fig *Figport) getModIfIsActive(mods []string, activeMod string) string {
 	return ""
 }
 
-func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string) error {
+type asyncDeploymentParams struct {
+	ctx context.Context
+	rendersOptions []figma.RenderOptions
+	exportingOptions exporting.ExportNodeOptions
+	accessToken string
+	fileKey string
+	nodeID string
+	prefix string
+}
+
+func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParams, reportChannel chan<- nodeDeploymentReport) {
+	group := &sync.WaitGroup{}
+	mutex := &sync.Mutex{}
+
+	totalNodes := int64(0)
+	totalSuccess := int64(0)
+	totalErrors := int64(0)
+
+	var renders []string
+	for _, renderOptions := range params.rendersOptions {
+		group.Add(1)
+		totalNodes += 1
+		go func(wg *sync.WaitGroup, renderOptions figma.RenderOptions) {
+			defer wg.Done()
+			logrus.WithFields(logrus.Fields{
+				"format":  renderOptions.Format,
+				"scale":   renderOptions.Scale,
+				"version": renderOptions.Version,
+			}).Debug("rendering node with options")
+
+			file, contentType, err := fig.figma.ObtainImage(params.accessToken, params.fileKey, params.nodeID, renderOptions)
+			if err != nil {
+				logrus.Error(errors.WithStack(err))
+				mutex.Lock()
+				totalErrors += 1
+				mutex.Unlock()
+				return
+			}
+
+			logrus.WithField("temp_file", file.Name()).Debug("temp_file generated from figma API render")
+
+			cleanedPath := strings.TrimPrefix(params.exportingOptions.Path, params.prefix)
+			cleanedPath = strings.TrimLeft(cleanedPath, " \\/.,")
+
+			if renderOptions.Scale != 1.0 {
+				cleanedPath += "@" + strconv.FormatFloat(renderOptions.Scale, 'f', -1, 64)
+			}
+
+			cleanedPath += "." + string(renderOptions.Format)
+
+			if _, err := fig.saveAsset(params.ctx, cleanedPath, contentType, file); err != nil {
+				logrus.Error(errors.WithStack(err))
+				mutex.Lock()
+				totalErrors += 1
+				mutex.Unlock()
+				return
+			}
+			mutex.Lock()
+			renders = append(renders, cleanedPath)
+			totalSuccess +=1
+			mutex.Unlock()
+		}(group, renderOptions)
+	}
+	group.Wait()
+	report := nodeDeploymentReport{
+		DeployAt:            time.Now(),
+		TotalRenders:        totalNodes,
+		TotalRendersSuccess: totalSuccess,
+		TotalRendersFailed:  totalErrors,
+		Renders:             renders,
+	}
+	reportChannel <- report
+}
+
+func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string) (<-chan nodeDeploymentReport, error) {
 	exportingOptions := fig.processNodeName(nodeName)
 
 	prefix := fig.config.GetString(config.FigportPrefix)
 	if prefix == "" {
-		return errors.New("invalid prefix for enable your exports")
+		return nil, errors.New("invalid prefix for enable your exports")
 	}
 
 	// To always add minimum @1 scale
@@ -123,6 +209,8 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 		"raw":      exportingOptions.Raw,
 	}).Debug("processing export naming")
 
+	doneChannel := make(chan nodeDeploymentReport, 1)
+
 	for _, activeMod := range fig.mods {
 		modDescriptor := fig.getModIfIsActive(exportingOptions.Mods, activeMod.Name())
 		if modDescriptor == "" {
@@ -131,7 +219,7 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 
 		params, err := fig.extractParamsFromModName(modDescriptor)
 		if err != nil {
-			return errors.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 
 		logrus.WithFields(logrus.Fields{
@@ -141,47 +229,28 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 
 		rendersOptions, err := activeMod.Process(exportingOptions, params)
 		if err != nil {
-			return errors.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 
 		logrus.WithFields(logrus.Fields{
 			"totalRenders": len(rendersOptions),
-		}).Debug("ready to save the renders")
+		}).Debug("ready to save the Renders")
 
-		for _, renderOptions := range rendersOptions {
-			logrus.WithFields(logrus.Fields{
-				"format":  renderOptions.Format,
-				"scale":   renderOptions.Scale,
-				"version": renderOptions.Version,
-			}).Debug("rendering node with options")
-
-			file, contentType, err := fig.figma.ObtainImage(accessToken, fileKey, nodeID, renderOptions)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
-			logrus.WithField("file", file.Name()).Debug("file generated from figma API render")
-
-			cleanedPath := strings.TrimPrefix(exportingOptions.Path, prefix)
-			cleanedPath = strings.TrimLeft(cleanedPath, " \\/.,")
-
-			if renderOptions.Scale != 1.0 {
-				cleanedPath += "@" + strconv.FormatFloat(renderOptions.Scale, 'f', -1, 64)
-			}
-
-			cleanedPath += "." + string(renderOptions.Format)
-
-			if _, err := fig.saveAsset(ctx, cleanedPath, contentType, file); err != nil {
-				return errors.WithStack(err)
-			}
-		}
-
+		go fig.asyncProcessAndDeployNodeRoutine(asyncDeploymentParams{
+			ctx:              ctx,
+			rendersOptions:   rendersOptions,
+			exportingOptions: exportingOptions,
+			accessToken:      accessToken,
+			fileKey:          fileKey,
+			nodeID:           nodeID,
+			prefix:           prefix,
+		}, doneChannel)
 	}
 
-	return nil
+	return doneChannel, nil
 }
 
-func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, fileKey string) error {
+func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, fileKey string, reportPipe chan nodeDeploymentReport) error {
 	figmaFile, err := fig.figma.GetCompleteFile(accessToken, fileKey)
 	if err != nil {
 		return errors.WithStack(err)
@@ -192,47 +261,34 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 		return errors.New("invalid prefix for enable your exports")
 	}
 
-	// Deprecated code, at the alpha stage I'm only need extract the components
-	//
-	// for _, page := range figmaFile.Document.Children {
-	// 	name := strings.ReplaceAll(page.Name, " ", "")
-	// 	logrus.Debug("name= ", name, ", page.Type= ", page.Type, ", prefix= ", prefix)
-	//
-	// 	for _, artboard := range page.Children {
-	// 		name := strings.ReplaceAll(artboard.Name, " ", "")
-	// 		toExport := strings.HasPrefix(name, prefix)
-	// 		if !toExport {
-	// 			continue
-	// 		}
-	//
-	// 		logrus.WithFields(logrus.Fields{
-	// 			"name": name,
-	// 		}).Debug("reading artboard")
-	//
-	// 		if err := fig.deployNode(ctx, accessToken, fileKey, page.ID, name); err != nil {
-	// 			return errors.WithStack(err)
-	// 		}
-	// 	}
-	//
-	// }
-
+	group := &sync.WaitGroup{}
 	for nodeID, componentInfo := range figmaFile.Components {
-		name := strings.ReplaceAll(componentInfo.Name, " ", "")
-		toExport := strings.HasPrefix(name, prefix)
+		group.Add(1)
+		go func (node string, reportPipe chan nodeDeploymentReport, componentInfo figma.Component, wg *sync.WaitGroup) {
+			defer wg.Done()
+			name := strings.ReplaceAll(componentInfo.Name, " ", "")
 
-		if !toExport {
-			continue
-		}
+			toExport := strings.HasPrefix(name, prefix)
+			if !toExport {
+				return
+			}
 
-		logrus.WithFields(logrus.Fields{
-			"name": name,
-		}).Debug("reading component")
+			logrus.WithFields(logrus.Fields{
+				"name": name,
+			}).Debug("reading component")
 
-		if err := fig.deployNode(ctx, accessToken, fileKey, nodeID, name); err != nil {
-			return errors.WithStack(err)
-		}
-
+			deploymentDone, err := fig.deployNode(ctx, accessToken, fileKey, node, name)
+			if err != nil {
+				logrus.Error(errors.WithStack(err))
+				return
+			}
+			report := <- deploymentDone
+			reportPipe <- report
+		}(nodeID, reportPipe, componentInfo, group)
 	}
+
+	group.Wait()
+	close(reportPipe)
 
 	return nil
 }
