@@ -13,7 +13,7 @@ const PortKey = "port"
 const DebugKey = "debug"
 
 // GlobalSecret ...
-const GlobalSecret = "global_secret"
+const GlobalSecret = "secret"
 
 //
 
@@ -33,7 +33,7 @@ const FigmaClientSecret = "figma.clientsecret"
 const FigmaRedirectURI = "figma.redirecturi"
 
 // FigmaToken TODO: writedescription
-const FigmaToken = "figma.token"
+const FigmaToken = "figma.accessToken"
 
 // FigmaDefaultFile TODO: writedescription
 const FigmaDefaultFile = "figma.defaultfile"
@@ -44,13 +44,13 @@ const FigmaDefaultFile = "figma.defaultfile"
 const S3Endpoint = "s3.endpoint"
 
 // S3AccessKeyID TODO: writedescription
-const S3AccessKeyID = "s3.accesskey"
+const S3AccessKeyID = "s3.accessKey"
 
 // S3SecretKey TODO: writedescription
-const S3SecretKey = "s3.secretkey"
+const S3SecretKey = "s3.secretKey"
 
 // S3UseSSL TODO: writedescription
-const S3UseSSL = "s3.usessl"
+const S3UseSSL = "s3.useSSL"
 
 // S3Region TODO: writedescription
 const S3Region = "s3.region"

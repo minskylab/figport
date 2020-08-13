@@ -18,10 +18,10 @@ import (
 
 type nodeDeploymentReport struct {
 	DeployAt            time.Time `json:"deployAt"`
-	TotalRenders        int64 `json:"totalRenders"`
-	TotalRendersSuccess int64 `json:"totalRendersSuccess"`
-	TotalRendersFailed  int64    `json:"totalRendersFailed"`
-	Renders             []string `json:"renders"` // TODO: Improve this Renders with a better struct (out of alpha)
+	TotalRenders        int64     `json:"totalRenders"`
+	TotalRendersSuccess int64     `json:"totalRendersSuccess"`
+	TotalRendersFailed  int64     `json:"totalRendersFailed"`
+	Renders             []string  `json:"renders"` // TODO: Improve this Renders with a better struct (out of alpha)
 }
 
 func (fig *Figport) processNodeName(nodeName string) exporting.ExportNodeOptions {
@@ -100,13 +100,13 @@ func (fig *Figport) getModIfIsActive(mods []string, activeMod string) string {
 }
 
 type asyncDeploymentParams struct {
-	ctx context.Context
-	rendersOptions []figma.RenderOptions
+	ctx              context.Context
+	rendersOptions   []figma.RenderOptions
 	exportingOptions exporting.ExportNodeOptions
-	accessToken string
-	fileKey string
-	nodeID string
-	prefix string
+	accessToken      string
+	fileKey          string
+	nodeID           string
+	prefix           string
 }
 
 func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParams, reportChannel *chan nodeDeploymentReport, wg *sync.WaitGroup) {
@@ -160,7 +160,7 @@ func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParam
 
 			mutex.Lock()
 			renders = append(renders, cleanedPath)
-			totalSuccess +=1
+			totalSuccess += 1
 			mutex.Unlock()
 		}(group, renderOptions)
 	}
@@ -176,7 +176,7 @@ func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParam
 	wg.Done()
 }
 
-func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string, reportPipe  *chan nodeDeploymentReport)  error {
+func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string, reportPipe *chan nodeDeploymentReport) error {
 	exportingOptions := fig.processNodeName(nodeName)
 
 	prefix := fig.config.GetString(config.FigportPrefix)
@@ -235,7 +235,6 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 			return errors.WithStack(err)
 		}
 
-
 		logrus.WithFields(logrus.Fields{
 			"totalRenders": len(rendersOptions),
 		}).Debug("ready to save the Renders")
@@ -270,7 +269,7 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 	group := &sync.WaitGroup{}
 	for nodeID, componentInfo := range figmaFile.Components {
 		group.Add(1)
-		go func (node string, reportPipe chan nodeDeploymentReport, componentInfo figma.Component, wg *sync.WaitGroup) {
+		go func(node string, reportPipe chan nodeDeploymentReport, componentInfo figma.Component, wg *sync.WaitGroup) {
 			defer wg.Done()
 			name := strings.ReplaceAll(componentInfo.Name, " ", "")
 
@@ -282,7 +281,6 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 			logrus.WithFields(logrus.Fields{
 				"name": name,
 			}).Debug("reading component")
-
 
 			if err := fig.deployNode(ctx, accessToken, fileKey, node, name, &reportPipe); err != nil {
 				logrus.Error(errors.WithStack(err))

@@ -3,3 +3,4 @@ figport
 temporal/
 *.rdb
 .idea/
+figport.config.*

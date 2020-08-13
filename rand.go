@@ -1,8 +1,6 @@
 package figport
 
-
 import "crypto/rand"
-
 
 const stdChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 

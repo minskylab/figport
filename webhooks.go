@@ -17,7 +17,7 @@ func (fig *Figport) registerDeploy() {
 		}
 
 		secret := c.Query("secret", "")
-		if len(secret) != config.DefaultSecretSize || secret != fig.config.GetString(config.GlobalSecret)  {
+		if len(secret) != config.DefaultSecretSize || secret != fig.config.GetString(config.GlobalSecret) {
 			sendError(c, errors.New("invalid secret or not found, pass your secret correctly"))
 			return
 		}
@@ -38,7 +38,7 @@ func (fig *Figport) registerDeploy() {
 			return
 		}
 
-		for r := range report{
+		for r := range report {
 			totalReports = append(totalReports, r)
 		}
 
