@@ -5,7 +5,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/minskylab/figport/config"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,7 +16,7 @@ func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 	fig.config.AddConfigPath("/etc/figport/")
 	fig.config.AddConfigPath(".")
 
-
+	// FigmaAPIBaseURL
 	fig.config.SetDefault(config.PortKey, "8080")
 	fig.config.SetDefault(config.HostNameKey, "127.0.0.1")
 	fig.config.SetDefault(config.FigmaAPIBaseURL, "https://api.figma.com")
@@ -31,9 +30,7 @@ func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 	fig.config.AutomaticEnv()
 	fig.config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	if err := fig.config.ReadInConfig(); err != nil {
-		return errors.WithStack(err)
-	}
+	_ = fig.config.ReadInConfig() // try to read the config file (if exists)
 
 	debugMode := fig.config.GetBool(config.DebugKey) || debug
 
@@ -61,7 +58,7 @@ func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 	logrus.WithFields(logrus.Fields{
 		"debug":         debugMode,
 		"personalToken": fig.withToken,
-	}).Info("configuration bootstrap done")
+	}).Info("configuration bootstrapping done")
 
 	return nil
 }

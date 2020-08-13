@@ -14,7 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...string) (*File, error) {
+func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string) (*File, error) {
 	endpoint, err := fig.FigmaAPIURI("/v1/files", fileKey)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -30,6 +30,10 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string, nodes ...
 	} else { // OAuth generated Token
 		req.Header.Add("Authorization", "Bearer "+accessToken)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"endpoint": endpoint,
+	}).Debug("getting figma file")
 
 	res, err := fig.httpClient.Do(req)
 	if err != nil {

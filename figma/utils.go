@@ -18,13 +18,13 @@ func (fig *Figma) figmaURI(base string, paths ...string) (string, error) {
 	return u.String(), nil
 }
 
-// FigmaURI only esports figmaURI utility
+// FigmaURI only exports figmaURI utility
 func (fig *Figma) FigmaURI(paths ...string) (string, error) {
 	base := fig.config.GetString(config.FigmaOauthURL)
 	return fig.figmaURI(base, paths...)
 }
 
-// FigmaAPIURI uses the api base insted to oauth base
+// FigmaAPIURI uses the api base instead to oauth base
 func (fig *Figma) FigmaAPIURI(paths ...string) (string, error) {
 	base := fig.config.GetString(config.FigmaAPIBaseURL)
 	return fig.figmaURI(base, paths...)
