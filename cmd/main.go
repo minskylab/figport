@@ -12,7 +12,8 @@ func main() {
 	debugMode := flag.Bool("debug", false, "activate or not: the debug log level")
 	flag.Parse()
 
-	exporter, err := figport.New(context.Background())
+	ctx := context.Background()
+	exporter, err := figport.New(ctx)
 	if err != nil {
 		logrus.Panic(err.Error())
 		return

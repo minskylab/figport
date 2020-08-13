@@ -4,3 +4,9 @@ A simple utility to make mor easy publish your design assets. The main goal of F
 
 1. **Figma Auth Token**, at the moment Figport only support your Personal Figma Access Token. To know how you can obtain your credential see [the official documentation](https://www.figma.com/developers/api#access-tokens).
 2. **S3 Credentials**, you can obtain these credentials from your S3 storage (e.g. AWS S3, Digital Ocean Spaces, Minio).
+
+
+
+## How it works
+
+Figport was thinking 
