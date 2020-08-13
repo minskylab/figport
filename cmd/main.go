@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	debugMode := flag.Bool("debug", false, "activate or not the debug log level")
+	debugMode := flag.Bool("debug", false, "activate or not: the debug log level")
 	flag.Parse()
 
 	exporter, err := figport.New(context.Background())
