@@ -271,9 +271,7 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 	for nodeID, componentInfo := range figmaFile.Components {
 		group.Add(1)
 		go func (node string, reportPipe chan nodeDeploymentReport, componentInfo figma.Component, wg *sync.WaitGroup) {
-			defer func () {
-				wg.Done()
-			}()
+			defer wg.Done()
 			name := strings.ReplaceAll(componentInfo.Name, " ", "")
 
 			toExport := strings.HasPrefix(name, prefix)

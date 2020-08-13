@@ -34,7 +34,7 @@ func (fig *Figma) getFromFigmaFile(accessToken string, fileKey string) (*File, e
 	logrus.WithFields(logrus.Fields{
 		"endpoint": endpoint,
 	}).Debug("getting figma file")
-
+	
 	res, err := fig.httpClient.Do(req)
 	if err != nil {
 		return nil, errors.WithStack(err)

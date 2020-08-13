@@ -1,21 +1,10 @@
-# build stage
 FROM golang:1.14 as builder
-
-ENV GO111MODULE=on
-
+COPY . /app
 WORKDIR /app
-
-COPY go.mod .
-COPY go.sum .
-
-RUN go mod download
-
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o figport cmd/*
-
-# final stage
-FROM scratch
-COPY --from=builder /app/figport /app/
-EXPOSE 8080
-ENTRYPOINT ["/app/figport"]
+ENV GO111MODULE=on
+RUN CGO_ENABLED=0 GOOS=linux go build -o app cmd/*
+#second stage
+FROM alpine:latest
+WORKDIR /root/
+COPY --from=builder /app .
+CMD ["./app"]
