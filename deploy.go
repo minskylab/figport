@@ -64,7 +64,7 @@ func (fig *Figport) processNodeName(nodeName string) exporting.ExportNodeOptions
 }
 
 func (fig *Figport) extractParamsFromModName(name string) (map[string]string, error) {
-	extractParams := regexp.MustCompile(`\([\w >,.= ]+\)`)
+	extractParams := regexp.MustCompile(`\([\w >,.=]+\)`)
 	params := extractParams.FindString(name)
 
 	logrus.WithFields(logrus.Fields{
@@ -109,7 +109,7 @@ type asyncDeploymentParams struct {
 	prefix string
 }
 
-func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParams, reportChannel chan<- nodeDeploymentReport) {
+func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParams, reportChannel *chan nodeDeploymentReport, wg *sync.WaitGroup) {
 	group := &sync.WaitGroup{}
 	mutex := &sync.Mutex{}
 
@@ -156,6 +156,8 @@ func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParam
 				mutex.Unlock()
 				return
 			}
+			logrus.WithField("asset", cleanedPath).Info("asset saved in your s3 storage")
+
 			mutex.Lock()
 			renders = append(renders, cleanedPath)
 			totalSuccess +=1
@@ -170,15 +172,16 @@ func (fig *Figport) asyncProcessAndDeployNodeRoutine(params asyncDeploymentParam
 		TotalRendersFailed:  totalErrors,
 		Renders:             renders,
 	}
-	reportChannel <- report
+	*reportChannel <- report
+	wg.Done()
 }
 
-func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string) (<-chan nodeDeploymentReport, error) {
+func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string, nodeID, nodeName string, reportPipe  *chan nodeDeploymentReport)  error {
 	exportingOptions := fig.processNodeName(nodeName)
 
 	prefix := fig.config.GetString(config.FigportPrefix)
 	if prefix == "" {
-		return nil, errors.New("invalid prefix for enable your exports")
+		return errors.New("invalid prefix for enable your exports")
 	}
 
 	// To always add minimum @1 scale
@@ -209,7 +212,7 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 		"raw":      exportingOptions.Raw,
 	}).Debug("processing export naming")
 
-	doneChannel := make(chan nodeDeploymentReport, 1)
+	group := &sync.WaitGroup{}
 
 	for _, activeMod := range fig.mods {
 		modDescriptor := fig.getModIfIsActive(exportingOptions.Mods, activeMod.Name())
@@ -219,7 +222,7 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 
 		params, err := fig.extractParamsFromModName(modDescriptor)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return errors.WithStack(err)
 		}
 
 		logrus.WithFields(logrus.Fields{
@@ -229,13 +232,15 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 
 		rendersOptions, err := activeMod.Process(exportingOptions, params)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return errors.WithStack(err)
 		}
+
 
 		logrus.WithFields(logrus.Fields{
 			"totalRenders": len(rendersOptions),
 		}).Debug("ready to save the Renders")
 
+		group.Add(1)
 		go fig.asyncProcessAndDeployNodeRoutine(asyncDeploymentParams{
 			ctx:              ctx,
 			rendersOptions:   rendersOptions,
@@ -244,10 +249,11 @@ func (fig *Figport) deployNode(ctx context.Context, accessToken, fileKey string,
 			fileKey:          fileKey,
 			nodeID:           nodeID,
 			prefix:           prefix,
-		}, doneChannel)
+		}, reportPipe, group)
 	}
 
-	return doneChannel, nil
+	group.Wait()
+	return nil
 }
 
 func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, fileKey string, reportPipe chan nodeDeploymentReport) error {
@@ -265,7 +271,9 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 	for nodeID, componentInfo := range figmaFile.Components {
 		group.Add(1)
 		go func (node string, reportPipe chan nodeDeploymentReport, componentInfo figma.Component, wg *sync.WaitGroup) {
-			defer wg.Done()
+			defer func () {
+				wg.Done()
+			}()
 			name := strings.ReplaceAll(componentInfo.Name, " ", "")
 
 			toExport := strings.HasPrefix(name, prefix)
@@ -277,18 +285,15 @@ func (fig *Figport) executeDeployment(ctx context.Context, accessToken string, f
 				"name": name,
 			}).Debug("reading component")
 
-			deploymentDone, err := fig.deployNode(ctx, accessToken, fileKey, node, name)
-			if err != nil {
+
+			if err := fig.deployNode(ctx, accessToken, fileKey, node, name, &reportPipe); err != nil {
 				logrus.Error(errors.WithStack(err))
 				return
 			}
-			report := <- deploymentDone
-			reportPipe <- report
 		}(nodeID, reportPipe, componentInfo, group)
 	}
 
 	group.Wait()
 	close(reportPipe)
-
 	return nil
 }

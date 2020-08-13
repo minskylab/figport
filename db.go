@@ -19,7 +19,7 @@ func newDatabase(ctx context.Context, opts *redis.Options) (*Database, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	logrus.WithField("address", opts.Addr).Debug("redis connection entableshid")
+	logrus.WithField("address", opts.Addr).Debug("redis connection established")
 
 	return &Database{redisClient: rdb}, nil
 }

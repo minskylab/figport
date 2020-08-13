@@ -14,20 +14,25 @@ import (
 	"github.com/spf13/viper"
 )
 
-// New ...
+// New returns a new instance of a Figport controller
 func New(ctx context.Context) (*Figport, error) {
 	conf := viper.New()
 	httpClient := &http.Client{
 		Timeout: 15 * time.Second,
 	}
 
-	database, err := newDatabase(ctx, &redis.Options{
-		Addr:     conf.GetString(config.RedisAddress),
-		Password: "",
-		DB:       0,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
+	var database *Database
+	var err error
+	redisAddress := conf.GetString(config.RedisAddress)
+	if redisAddress != "" {
+		database, err = newDatabase(ctx, &redis.Options{
+			Addr:     redisAddress,
+			Password: "",
+			DB:       0,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
 	}
 
 	figmaHandler := figma.New(conf, httpClient)

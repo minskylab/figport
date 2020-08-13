@@ -1,7 +1,6 @@
 package figport
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gofiber/fiber"
 	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
@@ -39,18 +38,13 @@ func (fig *Figport) registerDeploy() {
 			return
 		}
 
-		for {
-			r, ok := <- report
-			if !ok {
-				break
-			}
-			spew.Dump(r)
+		for r := range report{
 			totalReports = append(totalReports, r)
 		}
 
 		_ = c.JSON(totalReports)
 
-		logrus.Info("deployment executed")
+		logrus.Info("deployment process done")
 	})
 
 }

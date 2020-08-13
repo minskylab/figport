@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (fig *Figport) bootstrapDefaultConfig() error {
+func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 	_ = godotenv.Load()
 
 	fig.config.SetConfigName("figport.config")
@@ -17,13 +17,15 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 	fig.config.AddConfigPath("/etc/figport/")
 	fig.config.AddConfigPath(".")
 
+
 	fig.config.SetDefault(config.PortKey, "8080")
 	fig.config.SetDefault(config.HostNameKey, "127.0.0.1")
 	fig.config.SetDefault(config.FigmaAPIBaseURL, "https://api.figma.com")
 	fig.config.SetDefault(config.FigmaOauthURL, "https://www.figma.com")
 	fig.config.SetDefault(config.FigportPrefix, "figport")
 
-	fig.config.SetDefault(config.RedisAddress, "localhost:6379")
+	// deactivated because for this stage only need a stateless service.
+	// fig.config.SetDefault(config.RedisAddress, "localhost:6379")
 
 	fig.config.SetEnvPrefix("figport")
 	fig.config.AutomaticEnv()
@@ -33,7 +35,7 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 		return errors.WithStack(err)
 	}
 
-	debugMode := fig.config.GetBool(config.DebugKey)
+	debugMode := fig.config.GetBool(config.DebugKey) || debug
 
 	if debugMode {
 		logrus.SetLevel(logrus.DebugLevel)
@@ -51,7 +53,7 @@ func (fig *Figport) bootstrapDefaultConfig() error {
 		logrus.Info("global secret not manually choose")
 		logrus.Info("generating a new random global secret")
 		secret := newRandomString(config.DefaultSecretSize)
-		logrus.Infof("global secret: \"%s\"", secret)
+		logrus.Warnf("global secret: \"%s\"", secret)
 		logrus.Warn("that's so dangerous, try to set your own global secret by env variables ot yaml config")
 		fig.config.Set(config.GlobalSecret, secret)
 	}

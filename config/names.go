@@ -4,16 +4,16 @@ package config
 const HostNameKey = "hostname"
 
 // FigportPrefix the prefix to enable exportation in your figma file
-const FigportPrefix = "figport.prefix"
+const FigportPrefix = "prefix"
 
 // PortKey is port
 const PortKey = "port"
 
 // DebugKey ...
-const DebugKey = "figport.debug"
+const DebugKey = "debug"
 
 // GlobalSecret ...
-const GlobalSecret = "figport.globalsecret"
+const GlobalSecret = "global_secret"
 
 //
 

@@ -26,9 +26,9 @@ type Figport struct {
 }
 
 // Start bootstraps the start actions
-func (fig *Figport) Start() error {
+func (fig *Figport) Start(debug bool) error {
 	// configuration
-	if err := fig.bootstrapDefaultConfig(); err != nil {
+	if err := fig.bootstrapDefaultConfig(debug); err != nil {
 		logrus.Panic(err)
 	}
 

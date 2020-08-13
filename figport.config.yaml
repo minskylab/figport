@@ -1,6 +1,5 @@
 hostname: "figport.dev.minsky.cc"
 figport:
-  debug: true
   prefix: "figport"
   globalsecret: ""
 figma:
