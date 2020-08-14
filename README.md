@@ -9,7 +9,21 @@ A simple utility to make easy publish your design assets. The main goal of Figpo
 
 ## Getting started
 
-1. Launch the Figport service. Figport service is a docker container publicized in the official Docker hub.
+1. Launch the Figport service. Figport service is a docker image and it's delivery through the official Docker hub. The name of the image is `minskylab/figport`. In order to up the service you need to define your configuration using env variables or a simple yaml file kinda:
+
+   ```yaml
+   secret: figportsecret # that's important because
+   figma:
+     accessToken: <YOUR_FIGMA_ACCESS_TOKEN>
+   s3:
+     endpoint: <YOUR_S3_ENDPOINT>
+     accessKey: <YOUR_S3_ACCESS_KEY>
+     secretKey: <YOUR_S3_SECRET_KEY>
+     region: <YOUR_S3_REGION>
+     bucket: <YOUR_S3_BUCKET_NAME>
+   ```
+
+   
 
 
 
