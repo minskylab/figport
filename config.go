@@ -23,9 +23,9 @@ func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 	fig.config.SetDefault(config.FigmaOauthURL, "https://www.figma.com")
 	fig.config.SetDefault(config.FigportPrefix, "figport")
 
-	fig.config.SetDefault(config.S3Endpoint, "https://s3.amazonaws.com")
-	fig.config.SetDefault(config.S3Bucket, "figport")
-	fig.config.SetDefault(config.S3UseSSL, true)
+	// fig.config.SetDefault(config.S3Endpoint, "https://s3.amazonaws.com")
+	// fig.config.SetDefault(config.S3Bucket, "figport")
+	// fig.config.SetDefault(config.S3UseSSL, true)
 
 	// deactivated because for this stage only need a stateless service.
 	// fig.config.SetDefault(config.RedisAddress, "localhost:6379")
