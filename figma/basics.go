@@ -35,7 +35,7 @@ func (fig *Figma) ObtainImage(accessToken string, fileKey string, nodeID string,
 	return fig.downloadFromFigmaRender(image)
 }
 
-// GetCompleteFile returns the complete fetched file from your figma file Key
+// GetCompleteFile returns the complete fetched file from your figma file Key.
 func (fig *Figma) GetCompleteFile(accessToken string, fileKey string) (*File, error) {
 	return fig.getFromFigmaFile(accessToken, fileKey)
 }

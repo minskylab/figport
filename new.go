@@ -18,7 +18,7 @@ import (
 func New(ctx context.Context) (*Figport, error) {
 	conf := viper.New()
 	httpClient := &http.Client{
-		Timeout: 15 * time.Second,
+		Timeout: 5 * 60 * time.Second,
 	}
 
 	var database *Database
@@ -44,7 +44,9 @@ func New(ctx context.Context) (*Figport, error) {
 		&mods.PDFMod{},
 	}
 
-	fiberApp := fiber.New()
+	fiberApp := fiber.New(fiber.Config{
+		DisableStartupMessage: true,
+	})
 
 	return &Figport{
 		config:     conf,

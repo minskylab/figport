@@ -1,6 +1,8 @@
 package figport
 
 import (
+	"strings"
+
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/pkg/errors"
@@ -12,7 +14,7 @@ func (fig *Figport) connectS3() error {
 
 	logrus.WithFields(logrus.Fields{
 		"s3Endpoint": s3Options.Endpoint,
-	}).Info("establishment s3 connection")
+	}).Info("establishment s3 connection.")
 
 	client, err := minio.New(s3Options.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3Options.AccessKeyID, s3Options.SecretKey, ""),
@@ -21,7 +23,12 @@ func (fig *Figport) connectS3() error {
 	})
 
 	if err != nil {
-		return errors.WithStack(err)
+		if strings.Contains(err.Error(), "not follow ip address") {
+			logrus.Warn("starting figport without S3 integration.")
+		} else {
+
+			return errors.WithStack(err)
+		}
 	}
 
 	fig.s3Client = client

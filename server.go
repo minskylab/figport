@@ -10,6 +10,7 @@ import (
 func (fig *Figport) runServer() error {
 	fig.registerAuth()
 	fig.registerDeploy()
+	fig.registerStructure()
 
 	port := fig.config.GetString(config.PortKey)
 	if !strings.HasPrefix(port, ":") {
@@ -19,8 +20,6 @@ func (fig *Figport) runServer() error {
 	logrus.WithFields(logrus.Fields{
 		"port": port,
 	}).Info("server ready to listen")
-
-	// fig.server.Settings.DisableStartupMessage = true
 
 	return fig.server.Listen(port)
 }

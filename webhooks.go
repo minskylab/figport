@@ -39,11 +39,9 @@ func (fig *Figport) registerDeploy() {
 			totalReports = append(totalReports, r)
 		}
 
-		_ = c.JSON(totalReports)
-
 		logrus.Info("deployment process done")
 
-		return nil
+		return c.JSON(totalReports)
 	})
 
 }

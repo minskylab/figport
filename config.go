@@ -16,9 +16,10 @@ func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 	fig.config.AddConfigPath("/etc/figport/")
 	fig.config.AddConfigPath(".")
 
-	// FigmaAPIBaseURL
 	fig.config.SetDefault(config.PortKey, "8080")
 	fig.config.SetDefault(config.HostNameKey, "127.0.0.1")
+
+	// FigmaAPIBaseURL
 	fig.config.SetDefault(config.FigmaAPIBaseURL, "https://api.figma.com")
 	fig.config.SetDefault(config.FigmaOauthURL, "https://www.figma.com")
 	fig.config.SetDefault(config.FigportPrefix, "figport")
