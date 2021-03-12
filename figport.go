@@ -3,7 +3,7 @@ package figport
 import (
 	"net/http"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio-go/v7"
 	"github.com/minskylab/figport/figma"
 	"github.com/sirupsen/logrus"

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/minskylab/figport/config"
 	"github.com/minskylab/figport/figma"
 	"github.com/minskylab/figport/mods"

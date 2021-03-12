@@ -48,7 +48,7 @@ func (fig *Figport) saveAsset(ctx context.Context, path string, contentType stri
 
 	_, err = fig.s3Client.FPutObject(ctx, bucket, path, file.Name(), minio.PutObjectOptions{
 		UserMetadata: map[string]string{
-			"uploader": "figport agent",
+			"uploader": "figport-agent",
 		},
 		ContentType: contentType,
 		// TODO: Add more metadata for plugins

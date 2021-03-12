@@ -4,31 +4,29 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/minskylab/figport/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-func sendError(c *fiber.Ctx, err error) {
+func sendError(c *fiber.Ctx, err error) error {
 	logrus.Errorf("%#v", err)
-	_ = c.JSON(map[string]string{
+	return c.JSON(map[string]string{
 		"error": err.Error(),
 	})
 }
 
 func (fig *Figport) registerAuth() {
-	fig.server.Get("/auth", func(c *fiber.Ctx) {
+	fig.server.Get("/auth", func(c *fiber.Ctx) error {
 		state, err := fig.generateState(c.Context())
 		if err != nil {
-			sendError(c, errors.WithStack(err))
-			return
+			return sendError(c, errors.WithStack(err))
 		}
 
 		figmaAuthURL, err := url.Parse(figmaBaseOAuthURL)
 		if err != nil {
-			sendError(c, errors.WithStack(err))
-			return
+			return sendError(c, errors.WithStack(err))
 		}
 
 		q := figmaAuthURL.Query()
@@ -43,9 +41,10 @@ func (fig *Figport) registerAuth() {
 
 		c.Redirect(figmaAuthURL.String(), http.StatusTemporaryRedirect)
 
+		return nil
 	})
 
-	fig.server.Get("/oauth/callback", func(c *fiber.Ctx) {
+	fig.server.Get("/oauth/callback", func(c *fiber.Ctx) error {
 		body := c.Body()
 		logrus.Info(body)
 
@@ -61,20 +60,17 @@ func (fig *Figport) registerAuth() {
 
 		code, err := fig.callback(c.Context(), code, state)
 		if err != nil {
-			sendError(c, errors.WithStack(err))
-			return
+			return sendError(c, errors.WithStack(err))
 		}
 
 		token, err := fig.requestToken(code)
 		if err != nil {
-			sendError(c, errors.WithStack(err))
-			return
+			return sendError(c, errors.WithStack(err))
 		}
 
 		user, err := fig.registerNewUser(c.Context(), token)
 		if err != nil {
-			sendError(c, errors.WithStack(err))
-			return
+			return sendError(c, errors.WithStack(err))
 		}
 
 		// TODO: Implement a beauty user page response [200]
@@ -82,8 +78,9 @@ func (fig *Figport) registerAuth() {
 		c.SendString("Welcome " + user.Email)
 
 		if err = fig.destroyState(c.Context(), state); err != nil {
-			sendError(c, errors.WithStack(err))
-			return
+			return sendError(c, errors.WithStack(err))
 		}
+
+		return nil
 	})
 }

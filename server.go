@@ -20,7 +20,7 @@ func (fig *Figport) runServer() error {
 		"port": port,
 	}).Info("server ready to listen")
 
-	fig.server.Settings.DisableStartupMessage = true
+	// fig.server.Settings.DisableStartupMessage = true
 
 	return fig.server.Listen(port)
 }
