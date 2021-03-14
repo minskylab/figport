@@ -9,6 +9,7 @@ import (
 
 func (fig *Figport) runServer() error {
 	fig.registerAuth()
+	fig.registerK8SLiveness()
 	fig.registerDeploy()
 	fig.registerStructure()
 
