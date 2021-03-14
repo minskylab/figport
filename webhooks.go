@@ -16,7 +16,7 @@ func (fig *Figport) registerDeploy() {
 		}
 
 		secret := c.Query("secret", "")
-		if len(secret) != config.DefaultSecretSize || secret != fig.config.GetString(config.GlobalSecret) {
+		if len(secret) != config.DefaultSecretSize || secret != fig.config.GetString(config.FigportSecret) {
 			return sendError(c, errors.New("invalid secret or not found, pass your secret correctly"))
 		}
 

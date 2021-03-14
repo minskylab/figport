@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "figport.fullname" . }}
+  labels:
+    {{- include "figport.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "figport.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "figport.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "figport.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          {{- with .Values.secret }}
+            - name: "FIGPORT_SECRET"
+              value: {{ .Values.secret }}
+          {{- end -}}
+          {{- with .Values.figma.personalToken }}
+            - name: "FIGPORT_FIGMA_ACCESSTOKEN"
+              value: {{ .Values.figma.personalToken }}
+          {{- end -}}
+          {{- with .Values.s3.endpoint }}
+            - name: "FIGPORT_S3_ENDPOINT"
+              value: {{ .Values.s3.endpoint }}
+          {{- end -}}
+          {{- with .Values.s3.accessKeyID }}
+            - name: "FIGPORT_S3_ACCESSKEY"
+              value: {{ .Values.s3.accessKeyID }}
+          {{- end -}}
+          {{- with .Values.s3.secretKey }}
+            - name: "FIGPORT_S3_SECRETKEY"
+              value: {{ .Values.s3.secretKey }}
+          {{- end -}}
+          {{- with .Values.s3.useSSL }}
+            - name: "FIGPORT_S3_USESSL"
+              value: {{ .Values.s3.useSSL }}
+          {{- end -}}
+          {{- with .Values.s3.region }}
+            - name: "FIGPORT_S3_REGION"
+              value: {{ .Values.s3.region }}
+          {{- end -}}
+          {{- with .Values.s3.bucket }}
+            - name: "FIGPORT_S3_BUCKET"
+              value: {{ .Values.s3.bucket }}
+          {{- end -}}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
