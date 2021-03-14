@@ -50,14 +50,17 @@ func (fig *Figport) bootstrapDefaultConfig(debug bool) error {
 		fig.withToken = false
 	}
 
-	globalSecret := fig.config.GetString(config.GlobalSecret)
+	globalSecret := fig.config.GetString(config.FigportSecret)
 	if globalSecret == "" {
-		logrus.Info("global secret not manually choose")
-		logrus.Info("generating a new random global secret")
+		logrus.Warn("global secret not manually choose")
+		logrus.Warn("generating a new random global secret")
+
 		secret := newRandomString(config.DefaultSecretSize)
+
 		logrus.Warnf("global secret: \"%s\"", secret)
 		logrus.Warn("that's so dangerous, try to set your own global secret by env variables or yaml config")
-		fig.config.Set(config.GlobalSecret, secret)
+
+		fig.config.Set(config.FigportSecret, secret)
 	}
 
 	logrus.WithFields(logrus.Fields{

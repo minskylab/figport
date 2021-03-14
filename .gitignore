@@ -1,4 +1,3 @@
-figport
 .env
 temporal/
 *.rdb

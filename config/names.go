@@ -12,8 +12,8 @@ const PortKey = "port"
 // DebugKey ...
 const DebugKey = "debug"
 
-// GlobalSecret ...
-const GlobalSecret = "secret"
+// FigportSecret ...
+const FigportSecret = "secret"
 
 //
 
@@ -64,4 +64,3 @@ const S3Bucket = "s3.bucket"
 const RedisAddress = "redis.address"
 
 //
-
