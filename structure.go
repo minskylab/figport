@@ -18,7 +18,7 @@ func (fig *Figport) registerStructure() {
 
 		secret := c.Query("secret", "")
 
-		if secret != fig.config.GetString(config.GlobalSecret) {
+		if secret != fig.config.GetString(config.FigportSecret) {
 			return sendError(c, errors.New("invalid secret or not found, pass your secret correctly"))
 		}
 
