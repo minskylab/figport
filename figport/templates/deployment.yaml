@@ -34,8 +34,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: PORT
+              value: "8080"
+            {{- with .Values.secret }}
             - name: FIGPORT_SECRET
-              value: "{{ .Values.secret }}"
+              value: "{{ . }}"
+            {{- end }}
             {{- with .Values.figma }}
             - name: FIGPORT_FIGMA_ACCESSTOKEN
               value: "{{ .personalToken }}"
