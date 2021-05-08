@@ -5,12 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
-	"github.com/minskylab/figport/config"
 	"github.com/minskylab/figport/figma"
 	"github.com/minskylab/figport/mods"
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
@@ -22,18 +19,18 @@ func New(ctx context.Context) (*Figport, error) {
 	}
 
 	var database *Database
-	var err error
-	redisAddress := conf.GetString(config.RedisAddress)
-	if redisAddress != "" {
-		database, err = newDatabase(ctx, &redis.Options{
-			Addr:     redisAddress,
-			Password: "",
-			DB:       0,
-		})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-	}
+	// var err error
+	// redisAddress := conf.GetString(config.RedisAddress)
+	// if redisAddress != "" {
+	// 	database, err = newDatabase(ctx, &redis.Options{
+	// 		Addr:     redisAddress,
+	// 		Password: "",
+	// 		DB:       0,
+	// 	})
+	// 	if err != nil {
+	// 		return nil, errors.WithStack(err)
+	// 	}
+	// }
 
 	figmaHandler := figma.New(conf, httpClient)
 

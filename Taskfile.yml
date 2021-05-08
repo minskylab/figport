@@ -1,0 +1,52 @@
+version: "3"
+
+dotenv: [".env"]
+
+tasks:
+  temp-build:
+    cmds:
+      - go fmt cmd
+      - go build -v -o /tmp/figport cmd/*
+
+  start:
+    cmds:
+      - task: temp-build
+      - /tmp/figport
+
+  publish-docker:
+    cmds:
+      - docker build -t minskylab/figport:latest .
+      - docker push minskylab/figport:latest
+
+  start-docker:
+    cmds:
+      - docker run -v "$PWD/figport.config.yaml":/etc/figport/figport.config.yaml -p 8080:8080 minskylab/figport
+  # helm-deploy:
+  #   cmds:
+  #     - cmd: helm uninstall fairpay-dev-1 -n minsky
+  #       ignore_error: true
+  #     - cmd: helm install fairpay-dev-1 fairpay:dev/ -n minsky
+
+  # publish-minsky:
+  #   cmds:
+  #     - task: publish-docker
+  #     - task: helm-deploy
+  # - helm push chart/fairpay:dev/ minsky
+  # - helm repo update
+  feature:
+    cmds:
+      - "git flow feature start '{{.NAME}}'"
+      - 'bit save "feat: {{.DESCRIPTION}}"'
+      - "git flow feature finish"
+      - "git push"
+
+  release:
+    cmds:
+      - "git flow release start '{{.TAG}}'"
+      - 'bit save "release: {{.DESCRIPTION}}"'
+      - "git flow release finish"
+      - "git push"
+      - "git checkout main"
+      - "git push"
+      - "git push origin '{{.TAG}}'"
+      - "git checkout dev"
