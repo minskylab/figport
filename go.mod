@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/DataDog/sketches-go v0.0.0-20190923095040-43f19ad77ff7 // indirect
+	github.com/asdine/storm/v3 v3.2.1 // indirect
 	github.com/benbjohnson/clock v1.0.3 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-redis/redis/v8 v8.7.1
@@ -29,10 +30,11 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/valyala/fasthttp v1.22.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	go.etcd.io/bbolt v1.3.5 // indirect
 	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf // indirect
 	golang.org/x/exp v0.0.0-20210220032938-85be41e4509f // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
-	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2 // indirect
+	golang.org/x/sys v0.0.0-20210511113859-b0526f3d8744 // indirect
 	google.golang.org/grpc v1.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
